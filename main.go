@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/handlers"
 )
 
 type User struct {
@@ -18,7 +19,11 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", HandleFunc).Methods("GET")
 
-	http.ListenAndServe(":8080", r)
+	headersOk := handlers.AllowedHeaders([]string{"*"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"*"})
+
+	http.ListenAndServe(":8080", handlers.CORS(originsOk, headersOk, methodsOk)(router)))
 }
 
 func HandleFunc(w http.ResponseWriter, r *http.Request) {
